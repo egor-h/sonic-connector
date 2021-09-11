@@ -21,6 +21,8 @@ public class SonicClient implements Closeable {
     private BufferedReader sonicInput;
     private BufferedWriter sonicOutput;
 
+    private boolean closed;
+
     public SonicClient(String host, int port, String password, int timeout) {
         this.host = host;
         this.port = port;
@@ -45,6 +47,7 @@ public class SonicClient implements Closeable {
             sonicOutput = new BufferedWriter(new OutputStreamWriter(sonicSocket.getOutputStream()));
             checkReply(sonicInput.readLine(), r -> r.startsWith("CONNECTED"));
             start();
+            this.closed = false;
         } catch (IOException e) {
             throw new SonicException(e);
         }
@@ -97,6 +100,10 @@ public class SonicClient implements Closeable {
         return checkReply(sendCommand("PING"), r -> r.startsWith("PONG"));
     }
 
+    public boolean isClosed() {
+        return closed;
+    }
+
     @Override
     public void close() {
         try {
@@ -109,6 +116,8 @@ public class SonicClient implements Closeable {
             } catch (IOException e) {
                 throw new SonicException(e);
             }
+
+            this.closed = true;
         }
     }
 
