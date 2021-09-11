@@ -20,7 +20,7 @@ public class IngestClient extends SonicClient {
     }
 
     public String push(String collection, String bucket, String object, String data, String locale) {
-        return checkReply(sendCommand("PUSH", collection, bucket, object, wrap(data), locale.isEmpty() ? "" : String.format("LANG(%s)", locale)), PRED_HAS_OK);
+        return checkReply(sendCommand("PUSH", collection, bucket, object, wrap(escape(data)), locale.isEmpty() ? "" : String.format("LANG(%s)", locale)), PRED_HAS_OK);
     }
 
     public String push(String collection, String bucket, String object, String data) {

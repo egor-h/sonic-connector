@@ -125,6 +125,10 @@ public class SonicClient implements Closeable {
         return String.format("\"%s\"", s);
     }
 
+    protected String escape(String s) {
+        return s.replace("\n", " ").replace("\r", "").trim();
+    }
+
     public static void main(String[] args) {
         try (IngestClient ingestClient = new IngestClient("localhost", 14910, "SecretPassword");
              ControlClient controlClient = new ControlClient("localhost", 14910, "SecretPassword");
