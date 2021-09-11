@@ -1,3 +1,5 @@
+package com.github.egorh.sonic;
+
 import java.util.function.Predicate;
 
 public class IngestClient extends SonicClient {

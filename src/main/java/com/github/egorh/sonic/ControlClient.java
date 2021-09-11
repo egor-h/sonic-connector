@@ -1,3 +1,5 @@
+package com.github.egorh.sonic;
+
 public class ControlClient extends SonicClient {
     public enum TriggerAction {
         CONSOLIDATE, BACKUP, RESTORE

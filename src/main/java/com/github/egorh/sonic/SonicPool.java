@@ -1,3 +1,5 @@
+package com.github.egorh.sonic;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;

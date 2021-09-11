@@ -1,3 +1,5 @@
+package com.github.egorh.sonic;
+
 public class SonicException extends RuntimeException {
     public SonicException() {
     }
