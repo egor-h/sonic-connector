@@ -1,19 +1,17 @@
-import com.sun.org.apache.regexp.internal.RE;
-
 import java.util.function.Predicate;
 
-public class IngestMode extends SonicConnector {
+public class IngestClient extends SonicClient {
     private static Predicate<String> RESULT_CHECKER = r -> r.startsWith("RESULT") && r.split(" ").length == 2;
 
-    public IngestMode(String host, int port, String password, int timeout) {
+    public IngestClient(String host, int port, String password, int timeout) {
         super(host, port, password, timeout);
     }
 
-    public IngestMode(String host, int port, String password) {
+    public IngestClient(String host, int port, String password) {
         super(host, port, password);
     }
 
-    public IngestMode(String host, String password) {
+    public IngestClient(String host, String password) {
         super(host, password);
     }
 

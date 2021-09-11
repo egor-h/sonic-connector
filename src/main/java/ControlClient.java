@@ -1,19 +1,17 @@
-import java.util.Arrays;
-
-public class ControlMode extends SonicConnector {
+public class ControlClient extends SonicClient {
     public enum TriggerAction {
         CONSOLIDATE, BACKUP, RESTORE
     }
 
-    public ControlMode(String host, int port, String password, int timeout) {
+    public ControlClient(String host, int port, String password, int timeout) {
         super(host, port, password, timeout);
     }
 
-    public ControlMode(String host, int port, String password) {
+    public ControlClient(String host, int port, String password) {
         super(host, port, password);
     }
 
-    public ControlMode(String host, String password) {
+    public ControlClient(String host, String password) {
         super(host, password);
     }
 

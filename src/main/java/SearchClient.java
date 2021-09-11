@@ -2,16 +2,16 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class SearchMode extends SonicConnector {
-    public SearchMode(String host, int port, String password, int timeout) {
+public class SearchClient extends SonicClient {
+    public SearchClient(String host, int port, String password, int timeout) {
         super(host, port, password, timeout);
     }
 
-    public SearchMode(String host, int port, String password) {
+    public SearchClient(String host, int port, String password) {
         super(host, port, password);
     }
 
-    public SearchMode(String host, String password) {
+    public SearchClient(String host, String password) {
         super(host, password);
     }
 

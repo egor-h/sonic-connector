@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-public class SonicConnector implements Closeable {
+public class SonicClient implements Closeable {
     public static final int SONIC_DEFAULT_PORT = 1491;
     public static final int SONIC_DEFAULT_TIMEOUT = 20000;
 
@@ -21,7 +21,7 @@ public class SonicConnector implements Closeable {
     private BufferedReader sonicInput;
     private BufferedWriter sonicOutput;
 
-    public SonicConnector(String host, int port, String password, int timeout) {
+    public SonicClient(String host, int port, String password, int timeout) {
         this.host = host;
         this.port = port;
         this.password = password;
@@ -29,11 +29,11 @@ public class SonicConnector implements Closeable {
         openSocket();
     }
 
-    public SonicConnector(String host, int port, String password) {
+    public SonicClient(String host, int port, String password) {
         this(host, port, password, SONIC_DEFAULT_TIMEOUT);
     }
 
-    public SonicConnector(String host, String password) {
+    public SonicClient(String host, String password) {
         this(host, SONIC_DEFAULT_PORT, password);
     }
 
@@ -117,30 +117,30 @@ public class SonicConnector implements Closeable {
     }
 
     public static void main(String[] args) {
-        try (IngestMode ingestMode = new IngestMode("localhost", 14910, "SecretPassword");
-             ControlMode controlMode = new ControlMode("localhost", 14910, "SecretPassword");
-             SearchMode searchMode = new SearchMode("localhost", 14910, "SecretPassword")) {
+        try (IngestClient ingestClient = new IngestClient("localhost", 14910, "SecretPassword");
+             ControlClient controlClient = new ControlClient("localhost", 14910, "SecretPassword");
+             SearchClient searchClient = new SearchClient("localhost", 14910, "SecretPassword")) {
 //            System.out.println(ingestMode.start());
 //            System.out.println(controlMode.start());
-            System.out.println(ingestMode.ping());
-            System.out.println(ingestMode.push("col1", "buck1", "1", "Some text about nothing"));
-            System.out.println(ingestMode.push("col2", "buck1", "2", "Some text about nothing"));
-            System.out.println(ingestMode.push("col1", "buck1", "3", "Some text about something"));
-            System.out.println(ingestMode.push("col1", "buck1", "4", "Some text about nothingasd"));
-            System.out.println(ingestMode.push("col1", "buck1", "5", "Some text about somethingasd"));
-            controlMode.consolidate();
-            System.out.println(ingestMode.count("col1",  "buck1", "2"));
-            System.out.println(ingestMode.count("col1",  "buck1", "1"));
-            System.out.println(ingestMode.count("col1",  "buck1"));
-            System.out.println(ingestMode.count("col1"));
+            System.out.println(ingestClient.ping());
+            System.out.println(ingestClient.push("col1", "buck1", "1", "Some text about nothing"));
+            System.out.println(ingestClient.push("col2", "buck1", "2", "Some text about nothing"));
+            System.out.println(ingestClient.push("col1", "buck1", "3", "Some text about something"));
+            System.out.println(ingestClient.push("col1", "buck1", "4", "Some text about nothingasd"));
+            System.out.println(ingestClient.push("col1", "buck1", "5", "Some text about somethingasd"));
+            controlClient.consolidate();
+            System.out.println(ingestClient.count("col1",  "buck1", "2"));
+            System.out.println(ingestClient.count("col1",  "buck1", "1"));
+            System.out.println(ingestClient.count("col1",  "buck1"));
+            System.out.println(ingestClient.count("col1"));
 
-            new Thread(() -> searchMode.query("col1", "buck1", "some")).start();
+            new Thread(() -> searchClient.query("col1", "buck1", "some")).start();
 
 //            System.out.println(searchMode.start());
-            System.out.println(searchMode.query("col1", "buck1", "some"));
-            System.out.println(searchMode.query("col1", "buck1", "noth"));
-            System.out.println(searchMode.query("col2", "buck1", "noth"));
-            System.out.println(searchMode.query("col1", "buck1", "never"));
+            System.out.println(searchClient.query("col1", "buck1", "some"));
+            System.out.println(searchClient.query("col1", "buck1", "noth"));
+            System.out.println(searchClient.query("col2", "buck1", "noth"));
+            System.out.println(searchClient.query("col1", "buck1", "never"));
 
         }
 
