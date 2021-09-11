@@ -19,7 +19,7 @@ public class SonicPool {
         this.timeout = timeout;
     }
 
-    public synchronized <T extends SonicClient> T saveAndGetClient(Map<Long, T> pool, Supplier<T> client) {
+    protected synchronized <T extends SonicClient> T saveAndGetClient(Map<Long, T> pool, Supplier<T> client) {
         long curThreadId = Thread.currentThread().getId();
         if (pool.containsKey(curThreadId) && !pool.get(curThreadId).isClosed()) {
             return pool.get(curThreadId);
