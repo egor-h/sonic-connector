@@ -1,5 +1,8 @@
 package com.github.egorh.sonic;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.*;
 import java.net.Socket;
 import java.util.Arrays;
@@ -7,6 +10,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class SonicClient implements Closeable {
+    private static final Logger log = LoggerFactory.getLogger(SonicClient.class);
     public static final int SONIC_DEFAULT_PORT = 1491;
     public static final int SONIC_DEFAULT_TIMEOUT = 20000;
 
@@ -42,6 +46,7 @@ public class SonicClient implements Closeable {
     }
 
     protected void openSocket() {
+        log.trace("Open socket {}:{} timeout: {}", this.host, this.port, this.timeout);
         try {
             sonicSocket = new Socket(this.host, this.port);
             sonicSocket.setSoTimeout(timeout);
@@ -51,6 +56,7 @@ public class SonicClient implements Closeable {
             start();
             this.closed = false;
         } catch (IOException e) {
+            log.error("Exception during opening socket", e);
             throw new SonicException(e);
         }
     }
@@ -60,10 +66,12 @@ public class SonicClient implements Closeable {
             throw new SonicException("Current version supports single connection per thread. Create more connection instances for each thread.");
         }
         try {
-            sonicOutput.write(command + " " + Arrays.stream(args).collect(Collectors.joining(" ")) + "\r\n");
+            sonicOutput.write(command + " " + Arrays.stream(args).collect(Collectors.joining(" ")).trim() + "\r\n");
             sonicOutput.flush();
             return sonicInput.readLine();
         } catch (IOException e) {
+            close();
+            closed = true;
             throw new SonicException(e);
         }
     }
@@ -131,33 +139,4 @@ public class SonicClient implements Closeable {
         return s.replace("\n", " ").replace("\r", "").trim();
     }
 
-    public static void main(String[] args) {
-        try (IngestClient ingestClient = new IngestClient("localhost", 14910, "SecretPassword");
-             ControlClient controlClient = new ControlClient("localhost", 14910, "SecretPassword");
-             SearchClient searchClient = new SearchClient("localhost", 14910, "SecretPassword")) {
-//            System.out.println(ingestMode.start());
-//            System.out.println(controlMode.start());
-            System.out.println(ingestClient.ping());
-            System.out.println(ingestClient.push("col1", "buck1", "1", "Some text about nothing"));
-            System.out.println(ingestClient.push("col2", "buck1", "2", "Some text about nothing"));
-            System.out.println(ingestClient.push("col1", "buck1", "3", "Some text about something"));
-            System.out.println(ingestClient.push("col1", "buck1", "4", "Some text about nothingasd"));
-            System.out.println(ingestClient.push("col1", "buck1", "5", "Some text about somethingasd"));
-            controlClient.consolidate();
-            System.out.println(ingestClient.count("col1",  "buck1", "2"));
-            System.out.println(ingestClient.count("col1",  "buck1", "1"));
-            System.out.println(ingestClient.count("col1",  "buck1"));
-            System.out.println(ingestClient.count("col1"));
-
-            new Thread(() -> searchClient.query("col1", "buck1", "some")).start();
-
-//            System.out.println(searchMode.start());
-            System.out.println(searchClient.query("col1", "buck1", "some"));
-            System.out.println(searchClient.query("col1", "buck1", "noth"));
-            System.out.println(searchClient.query("col2", "buck1", "noth"));
-            System.out.println(searchClient.query("col1", "buck1", "never"));
-
-        }
-
-    }
 }
