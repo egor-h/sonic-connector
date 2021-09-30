@@ -63,10 +63,13 @@ public class SonicClient implements Closeable {
 
     protected String sendCommand(String command, String ...args) {
         if (threadId != Thread.currentThread().getId()) {
+            log.error("Foreign thread invocation");
             throw new SonicException("Current version supports single connection per thread. Create more connection instances for each thread.");
         }
         try {
-            sonicOutput.write(command + " " + Arrays.stream(args).collect(Collectors.joining(" ")).trim() + "\r\n");
+            String preparedCommand = command + " " + Arrays.stream(args).collect(Collectors.joining(" ")).trim() + "\r\n";
+            log.trace("sendCommand {}", preparedCommand);
+            sonicOutput.write(preparedCommand);
             sonicOutput.flush();
             return sonicInput.readLine();
         } catch (IOException e) {
@@ -78,7 +81,9 @@ public class SonicClient implements Closeable {
 
     protected String readLine() {
         try {
-            return sonicInput.readLine();
+            String reply = sonicInput.readLine();
+            log.trace("readline {}", reply);
+            return reply;
         } catch (IOException e) {
             throw new SonicException(e);
         }
