@@ -6,7 +6,7 @@
 
     <groupId>com.github.egorh.sonic</groupId>
     <artifactId>sonic-connector</artifactId>
-    <version>1.11</version>
+    <version>1.2</version>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
