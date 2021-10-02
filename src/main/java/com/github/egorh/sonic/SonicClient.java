@@ -66,14 +66,31 @@ public class SonicClient implements Closeable {
             log.error("Foreign thread invocation");
             throw new SonicException("Current version supports single connection per thread. Create more connection instances for each thread.");
         }
+
         try {
+            if (command.equals("START")) {
+                log.trace("skip check on START command");
+            } else {
+                if (!pingUnchecked()) {
+                    log.trace("Socket is closed. Open new one.."); // socket.isClosed() always returns true so recreate socket on null response
+                    openSocket();
+                }
+            }
             String preparedCommand = command + " " + Arrays.stream(args).collect(Collectors.joining(" ")).trim() + "\r\n";
             log.trace("sendCommand {}", preparedCommand);
             sonicOutput.write(preparedCommand);
             sonicOutput.flush();
-            return sonicInput.readLine();
+            String reply = sonicInput.readLine();
+            log.trace("reply: {}", reply);
+            return reply;
         } catch (IOException e) {
-            close();
+            if (!sonicSocket.isClosed()) {
+                try {
+                    this.sonicSocket.close();
+                } catch (IOException e2) {
+                    throw new SonicException(e2);
+                }
+            }
             closed = true;
             throw new SonicException(e);
         }
@@ -113,6 +130,19 @@ public class SonicClient implements Closeable {
 
     public String ping() {
         return checkReply(sendCommand("PING"), r -> r.startsWith("PONG"));
+    }
+
+    protected boolean pingUnchecked() {
+        try {
+            sonicOutput.write("PING\r\n ");
+            sonicOutput.flush();
+            String reply = sonicInput.readLine();
+            log.trace("pingUnchecked reply: {}", reply);
+            return reply != null && reply.startsWith("PONG");
+        } catch (IOException e) {
+            throw new SonicException(e);
+        }
+
     }
 
     public boolean isClosed() {
